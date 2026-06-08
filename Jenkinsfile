@@ -28,7 +28,7 @@ pipeline {
                 docker run -d --name sentiment-test -p 5000:5000 sentiment-api:test
 
                 echo "Waiting for API to start..."
-                sleep 25
+                sleep 40
 
                 curl --fail http://localhost:5000/health || exit 1
                 '''
