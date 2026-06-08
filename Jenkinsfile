@@ -38,9 +38,8 @@ pipeline {
 
             steps {
 
-                sh '''
-                pytest tests/test_api.py
-                '''
+                
+                sh 'docker exec sentiment-test pytest tests/test_api.py'
             }
         }
 
@@ -48,9 +47,7 @@ pipeline {
 
             steps {
 
-                sh '''
-                pytest tests/test_ui.py
-                '''
+                sh 'docker exec sentiment-test pytest tests/test_ui.py'
             }
         }
 
