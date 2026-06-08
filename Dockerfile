@@ -26,3 +26,5 @@ COPY . .
 
 ENV CHROME_BIN=/usr/bin/chromium
 ENV CHROMIUM_PATH=/usr/bin/chromium
+
+EXPOSE 5000
