@@ -1,13 +1,12 @@
 FROM python:3.11-slim
 
-RUN apt-get update && apt-get install -y \
+RUN RUN apt-get update && apt-get install -y \
     wget \
     gnupg \
     unzip \
     chromium \
     chromium-driver \
     libnss3 \
-    libgconf-2-4 \
     libxi6 \
     libxrender1 \
     libxrandr2 \
