@@ -27,4 +27,4 @@ COPY . .
 ENV CHROME_BIN=/usr/bin/chromium
 ENV CHROMIUM_PATH=/usr/bin/chromium
 
-EXPOSE 5000
+CMD ["flask", "run", "--host=0.0.0.0", "--port=5000"]
