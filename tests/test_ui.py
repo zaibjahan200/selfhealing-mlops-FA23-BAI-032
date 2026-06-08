@@ -13,7 +13,7 @@ def test_frontend_sentiment():
     driver = webdriver.Chrome(options=options)
 
     try:
-        driver.get("http://16.16.226.86:32500")
+        driver.get("http://16.16.226.86:5000")
 
         driver.find_element(
             By.ID,

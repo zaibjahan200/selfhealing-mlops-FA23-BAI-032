@@ -1,6 +1,6 @@
 import requests
 
-BASE_URL = "http://16.16.226.86:32500"
+BASE_URL = "http://16.16.226.86:5000"
 
 def test_health_endpoint():
     r = requests.get(f"{BASE_URL}/health")
