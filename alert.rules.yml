@@ -1,0 +1,15 @@
+groups:
+  - name: sentiment-alerts
+
+    rules:
+      - alert: ModelConfidenceDrift
+
+        expr: prediction_confidence_score < 0.617
+
+        for: 1m
+
+        labels:
+          severity: critical
+
+        annotations:
+          summary: Model confidence below threshold
