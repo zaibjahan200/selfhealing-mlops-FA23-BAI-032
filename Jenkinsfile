@@ -19,17 +19,18 @@ pipeline {
         }
 
         stage('Build and Run') {
-
             steps {
-
                 sh '''
                 docker build -t sentiment-api:test .
+
                 docker rm -f sentiment-test || true
 
-                docker run -d \
-                --name sentiment-test \
-                -p 5000:5000 \
-                sentiment-api:test
+                docker run -d --name sentiment-test -p 5000:5000 sentiment-api:test
+
+                echo "Waiting for API to start..."
+                sleep 25
+
+                curl --fail http://localhost:5000/health || exit 1
                 '''
             }
         }
