@@ -82,13 +82,14 @@ pipeline {
             steps {
 
                 sh '''
-                kubectl apply -f k8s/pvc.yaml
+                minikube start
+                minikube update-context
+                kubectl config use-context minikube
 
-                kubectl apply -f k8s/blue-deployment.yaml
-
-                kubectl apply -f k8s/green-deployment.yaml
-
-                kubectl apply -f k8s/service.yaml
+                kubectl apply -f k8s/pvc.yaml --validate=false
+                kubectl apply -f k8s/blue-deployment.yaml --validate=false
+                kubectl apply -f k8s/green-deployment.yaml --validate=false
+                kubectl apply -f k8s/service.yaml --validate=false
                 '''
             }
         }
