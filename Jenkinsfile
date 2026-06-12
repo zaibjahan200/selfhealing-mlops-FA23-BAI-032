@@ -82,7 +82,7 @@ pipeline {
             steps {
 
                 sh '''
-                minikube start
+                minikube start --driver=docker --ports=32500:32500
                 minikube update-context
                 kubectl config use-context minikube
 
