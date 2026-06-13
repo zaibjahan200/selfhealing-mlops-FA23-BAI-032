@@ -27,7 +27,7 @@ pipeline {
     stage('Build and Push') {
       steps {
         withCredentials([usernamePassword(credentialsId:'dockerhub', usernameVariable:'DHUSER', passwordVariable:'DHPASS')]) {
-          sh 'docker login -u $DHUSER -p $DHPASS'
+          sh 'echo "$DHPASS" | docker login -u "$DHUSER" --password-stdin'
           sh 'docker build -t $DOCKER_USER/sentiment-api:unstable .'
           sh 'git stash; git checkout stable-fallback; docker build -t $DOCKER_USER/sentiment-api:stable .; git checkout main; git stash pop || true'
           sh 'docker push $DOCKER_USER/sentiment-api:unstable'
