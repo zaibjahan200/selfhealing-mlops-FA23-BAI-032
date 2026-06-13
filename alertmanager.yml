@@ -11,6 +11,7 @@ receivers:
   webhook_configs:
 
   - url: 'http://16.16.226.86:8080/generic-webhooktrigger/invoke?token=ROLLBACK_43C5A7_TOKEN'
+    send_resolved: true
 
     http_config:
 
