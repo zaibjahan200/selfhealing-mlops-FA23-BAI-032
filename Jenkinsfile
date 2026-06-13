@@ -1,97 +1,57 @@
 pipeline {
-
-    agent any
-
-    environment {
-
-        DOCKER_USER = 'zaibjahan200'
+  agent any
+  environment {
+    DOCKER_USER = 'zaibjahan200'
+  }
+  stages {
+    stage('Fetch') {
+      steps { checkout scm }
     }
-
-    stages {
-
-        stage('Fetch') {
-
-            steps {
-
-                checkout scm
-
-            }
-        }
-
-        stage('Build and Run') {
-            steps {
-                sh '''
-                docker build -t sentiment-api:test .
-
-                docker rm -f sentiment-test || true
-
-                docker run -d --name sentiment-test -p 5000:5000 sentiment-api:test
-
-                echo "Waiting for API to start..."
-                sleep 40
-
-                curl --fail http://localhost:5000/health || exit 1
-                '''
-            }
-        }
-
-        stage('Unit Test') {
-
-            steps {
-
-                
-                sh 'docker exec sentiment-test pytest tests/test_api.py'
-            }
-        }
-
-        stage('UI Test') {
-
-            steps {
-
-                sh 'docker exec sentiment-test pytest tests/test_ui.py'
-            }
-        }
-
-        stage('Build and Push') {
-
-            steps {
-
-                withCredentials([
-                    usernamePassword(
-                        credentialsId: 'dockerhub',
-                        usernameVariable: 'USER',
-                        passwordVariable: 'PASS'
-                    )
-                ]) {
-
-                    sh '''
-                    echo $PASS | docker login -u $USER --password-stdin
-
-                    docker build \
-                    -t zaibjahan200/sentiment-api:unstable .
-
-                    docker push \
-                    zaibjahan200/sentiment-api:unstable
-                    '''
-                }
-            }
-        }
-
-        stage('Deploy to Minikube') {
-
-            steps {
-
-                sh '''
-                minikube start --driver=docker --ports=32500:32500
-                minikube update-context
-                kubectl config use-context minikube
-
-                kubectl apply -f k8s/pvc.yaml --validate=false
-                kubectl apply -f k8s/blue-deployment.yaml --validate=false
-                kubectl apply -f k8s/green-deployment.yaml --validate=false
-                kubectl apply -f k8s/service.yaml --validate=false
-                '''
-            }
-        }
+    stage('Build and Run') {
+      steps {
+        sh 'docker build -t sentiment-test .'
+        sh 'docker run -d --name sentiment-app -p 5000:5000 sentiment-test'
+        sh 'sleep 15'
+      }
     }
+    stage('Unit Test') {
+      steps {
+        sh 'docker run --rm --network host sentiment-test pytest tests/test_api.py -v'
+      }
+    }
+    stage('UI Test') {
+      steps {
+        sh 'docker run --rm --network host sentiment-test pytest tests/test_ui.py -v'
+      }
+    }
+    stage('Build and Push') {
+      steps {
+        withCredentials([usernamePassword(credentialsId:'dockerhub', usernameVariable:'DHUSER', passwordVariable:'DHPASS')]) {
+          sh 'docker login -u $DHUSER -p $DHPASS'
+          sh 'docker build -t $DOCKER_USER/sentiment-api:unstable .'
+          sh 'git stash; git checkout stable-fallback; docker build -t $DOCKER_USER/sentiment-api:stable .; git checkout main; git stash pop || true'
+          sh 'docker push $DOCKER_USER/sentiment-api:unstable'
+          sh 'docker push $DOCKER_USER/sentiment-api:stable'
+        }
+      }
+    }
+    stage('Deploy to Minikube') {
+      steps {
+        sh '''
+            # Check if minikube is running, start if not
+            if ! minikube status | grep -q "Running"; then
+                minikube start --driver=docker
+            fi
+
+            # Always apply kubectl regardless
+            eval $(minikube docker-env)
+            kubectl apply -f k8s/pvc.yaml
+            kubectl apply -f k8s/blue-deployment.yaml
+            kubectl apply -f k8s/green-deployment.yaml
+            kubectl apply -f k8s/service.yaml
+        '''
+      }
+    }
+  }
+  post { always { sh 'docker rm -f sentiment-app || true' } }
 }

@@ -31,6 +31,9 @@ def test_predict_negative_text():
         timeout=5
     )
 
+    
+    data = r.json()
+    assert data["label"] == "NEGATIVE"
     assert r.status_code == 200
 
 def test_health_returns_model_version_unstable():

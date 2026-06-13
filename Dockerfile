@@ -1,9 +1,6 @@
 FROM python:3.11-slim
 
 RUN apt-get update && apt-get install -y \
-    wget \
-    gnupg \
-    unzip \
     chromium \
     chromium-driver \
     libnss3 \
@@ -12,9 +9,8 @@ RUN apt-get update && apt-get install -y \
     libxrandr2 \
     libxss1 \
     libgtk-3-0 \
-    libasound2 \
+    libglib2.0-0 \
     fonts-liberation \
-    xdg-utils \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -27,6 +23,6 @@ COPY . .
 ENV CHROME_BIN=/usr/bin/chromium
 ENV CHROMIUM_PATH=/usr/bin/chromium
 
-CMD ["flask", "run", "--host=0.0.0.0", "--port=5000"]
-
 EXPOSE 5000
+
+CMD ["python", "app.py"]
