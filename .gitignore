@@ -2,3 +2,4 @@ Customizations.csv
 *.pdf
 *.txt
 test.txt
+evaluate*.py
