@@ -49,8 +49,9 @@ pipeline {
             kubectl apply -f k8s/blue-deployment.yaml
             kubectl apply -f k8s/green-deployment.yaml
             kubectl apply -f k8s/service.yaml
-            docker rm -f sentiment-app || true
+            
         '''
+        sh 'docker rm -f sentiment-app || true'
       }
     }
   }
