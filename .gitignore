@@ -1,5 +1,7 @@
 Customizations.csv
 *.pdf
-*.txt
-test.txt
+do*.txt
+co*.txt
+Je*.txt
+test*.txt
 evaluate*.py
